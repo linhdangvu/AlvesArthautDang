@@ -1,5 +1,5 @@
-from astar import path, solutionRobot2, instructionRobotTest
+from astar import path, solutionRobot
 print("Astar path: {}".format(path))
 
-# solutionRobot2(path, ser=None)
-instructionRobotTest(path, ser=None)
+solutionRobot(path, ser=None)
+

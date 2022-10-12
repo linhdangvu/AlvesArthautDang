@@ -97,7 +97,7 @@ def isInChildren(child, children):
 def isInIndex(maze, start, end):
     row = len(maze)
     col = len(maze[len(maze) -1])
-    return start[0] < row and start[1] < col and end[0] < row and end[1] < col and maze[start[0]][start[1]] != 1 and maze[end[0]][end[1]] != 1
+    return start[0] < row and start[1] < col and end[0] < row and end[1] < col and maze[start[0]][start[1]] != 1 and maze[end[0]][end[1]] != 1 and maze[start[0]][start[1]] != 2 and maze[end[0]][end[1]] != 2
 
 def astar(maze, start, end):
     ## TODO: Implement A start algorithm
@@ -168,12 +168,34 @@ def dataLidar(path): # angle dist => lidar
 #         plt.pause(.1)
 #     plt.show()
 
+def increaseObstacle(mat):
+    for i in range(len(mat)):
+        for j in range(len(mat[i])):
+            #print("{},{}".format(i,j))
+            if mat[i][j] == 1:
+                #print("{},{}".format(i,j))
+                # print("{},{}".format(i,j))
+                if mat[i][j-1] != 1:
+                    mat[i][j-1] = 2.
+                if j < (len(mat[i])-1):
+                    if mat[i][j+1] != 1:
+                        mat[i][j+1] = 2.
+    return mat
+
+def roundZero(mat):
+    nMat = np.pad(mat, pad_width=1, mode='constant', constant_values=0)
+    return nMat
+
 def convertToMatrix(path):
     matrix = np.asarray([[0.]*10]*10) 
     for i in path:
         x = int(i[0]/200) # 20 cases => 0 -> 19
         y = int(i[1]/200) # 20 cases => 0 -> 10
         matrix[x][y] = 1.
+    if matrix[0][4] == 1 or matrix[0][5] == 1:
+        matrix = roundZero(matrix)
+        matrix = increaseObstacle(matrix)
+    # print(matrix)
     return matrix
 
 def rotateLeftMatrix(m):
@@ -199,13 +221,13 @@ def goDown(ser):
 
 def goLeft(ser):
     sleep(0.1)
-    for i in range(20):
+    for i in range(15):
         sleep(0.1)
         sendInstruction('q', ser)
 
 def goRight(ser):
     sleep(0.1)
-    for i in range(20):
+    for i in range(15):
         sleep(0.1)
         sendInstruction('d', ser)
 
@@ -262,69 +284,69 @@ def solutionRobot(pathAstar, ser):
             goRight(ser)
             print("Go right")
 
-def instructionRobot(pathAstar, ser):
-    path_robot = pathRobot(pathAstar)
-    direction = pathAstar[0]
-    for (index, pos) in enumerate(path_robot[0:1]):
-        # print(1/(index+1))
-        # sleep(1/(index+1))
-        if sameDirection(pos, direction):
-            print ('continue same direction')
-        else:
-            if pos == DOWN:
-                # TO go down
-                if direction == LEFT:
-                    print("Turn left <=")
-                    turnLeft(ser)
-                elif direction == RIGHT:
-                    print("Turn right =>")
-                    turnRight(ser)
-                else:
-                    print("Turn down")
-                    turnDown(ser)
-                print("Go ahead - D")
-                goUp(ser)
-                direction = DOWN  
-                # print("Go down")      
-            if pos == UP:
-                # To go up
-                if direction == LEFT:
-                    print ("Turn right =>")
-                    turnRight(ser)
-                if direction == RIGHT:
-                    print ("Turn left <=")
-                    turnLeft(ser)
-                print("Go up or ahead")
-                goUp(ser)
-                direction = UP
-                # print("Go up")
-            if pos == LEFT:
-                # To go left
-                if direction == DOWN:
-                    print("Turn right =>")
-                    turnRight(ser)
-                # if direction == UP:
-                #     print("Turn left <=")
-                else:
-                    print("Turn left and go")
-                    turnLeft(ser)
-                    goUp(ser)
-                direction = LEFT
-                # print("Go left")
-            if pos == RIGHT:
-                # To go right
-                # if direction == UP:
-                #     print("Turn right =>")
-                if direction == DOWN:
-                    print("Turn left <=")
-                    turnLeft(ser)
-                else:
-                    print("Turn right and go")
-                    turnRight(ser)
-                goUp(ser)
-                # print("Go ahead - R")
-                direction = RIGHT
-                # print("Go right")
+# def instructionRobot(pathAstar, ser):
+#     path_robot = pathRobot(pathAstar)
+#     direction = pathAstar[0]
+#     for (index, pos) in enumerate(path_robot[0:1]):
+#         # print(1/(index+1))
+#         # sleep(1/(index+1))
+#         if sameDirection(pos, direction):
+#             print ('continue same direction')
+#         else:
+#             if pos == DOWN:
+#                 # TO go down
+#                 if direction == LEFT:
+#                     print("Turn left <=")
+#                     turnLeft(ser)
+#                 elif direction == RIGHT:
+#                     print("Turn right =>")
+#                     turnRight(ser)
+#                 else:
+#                     print("Turn down")
+#                     turnDown(ser)
+#                 print("Go ahead - D")
+#                 goUp(ser)
+#                 direction = DOWN  
+#                 # print("Go down")      
+#             if pos == UP:
+#                 # To go up
+#                 if direction == LEFT:
+#                     print ("Turn right =>")
+#                     turnRight(ser)
+#                 if direction == RIGHT:
+#                     print ("Turn left <=")
+#                     turnLeft(ser)
+#                 print("Go up or ahead")
+#                 goUp(ser)
+#                 direction = UP
+#                 # print("Go up")
+#             if pos == LEFT:
+#                 # To go left
+#                 if direction == DOWN:
+#                     print("Turn right =>")
+#                     turnRight(ser)
+#                 # if direction == UP:
+#                 #     print("Turn left <=")
+#                 else:
+#                     print("Turn left and go")
+#                     turnLeft(ser)
+#                     goUp(ser)
+#                 direction = LEFT
+#                 # print("Go left")
+#             if pos == RIGHT:
+#                 # To go right
+#                 # if direction == UP:
+#                 #     print("Turn right =>")
+#                 if direction == DOWN:
+#                     print("Turn left <=")
+#                     turnLeft(ser)
+#                 else:
+#                     print("Turn right and go")
+#                     turnRight(ser)
+#                 goUp(ser)
+#                 # print("Go ahead - R")
+#                 direction = RIGHT
+#                 # print("Go right")
 
 ##################
 
@@ -383,16 +405,17 @@ def instructionRobot(pathAstar, ser):
 
 ##### TEST CSV #####
 
-#### data 0
-# start = (0, 10)
-# end = (19, 10)
+# ### data 0
+# start = (0, 5)
+# end = (11, 5)
 # path0 = readCSV('../csv/data0.csv')
-# displayCSV(path0)
+# # displayCSV(path0)
 # matrix0 = convertToMatrix(path0)
-# displayMatrix(matrix0)
+# print(matrix0)
+# # displayMatrix(matrix0)
 # path = astar(matrix0, start, end)
-# displayPath(matrix0, path)
-# print(verify(matrix0, start, end, path))
+# # displayPath(matrix0, path)
+# # print(verify(matrix0, start, end, path))
 
 # start = (0, 10)
 # end = (19, 11)
@@ -404,39 +427,42 @@ def instructionRobot(pathAstar, ser):
 # print(verify(rotate_1, start, end, path))
 
 # #### data 1
-# start = (0, 10)
-# end = (19, 10)
+# start = (0, 5)
+# end = (10, 5)
 # path1 = readCSV('../csv/data1.csv')
-# displayCSV(path1)
+# # displayCSV(path1)
 # matrix1 = convertToMatrix(path1)
-# displayMatrix(matrix1)
+# print(matrix1)
+# # displayMatrix(matrix1)
 # path = astar(matrix1, start, end)
-# displayPath(matrix1, path)
-# print(verify(matrix1, start, end, path))
+# # displayPath(matrix1, path)
+# # print(verify(matrix1, start, end, path))
 
 
 # #### data 2
-# start = (0, 10)
-# end = (19, 10)
+# start = (0, 5)
+# end = (9, 5)
 # path2 = readCSV('../csv/data2.csv')
-# displayCSV(path2)
+# # displayCSV(path2)
 # matrix2 = convertToMatrix(path2)
-# displayMatrix(matrix2)
+# print(matrix2)
+# # displayMatrix(matrix2)
 # path = astar(matrix2, start, end)
-# displayPath(matrix2, path)
-# print(verify(matrix2, start, end, path))
+# # displayPath(matrix2, path)
+# # print(verify(matrix2, start, end, path))
 
 
 # #### data 3
-# start = (0, 10)
-# end = (19, 10)
+# start = (0, 5)
+# end = (9, 5)
 # path3 = readCSV('../csv/data3.csv')
-# displayCSV(path3)
+# # displayCSV(path3)
 # matrix3 = convertToMatrix(path3)
-# displayMatrix(matrix3)
+# print(matrix3)
+# # displayMatrix(matrix3)
 # path = astar(matrix3, start, end)
-# displayPath(matrix3, path)
-# print(verify(matrix3, start, end, path))
+# # displayPath(matrix3, path)
+# # print(verify(matrix3, start, end, path))
 
 
 # #### data 4

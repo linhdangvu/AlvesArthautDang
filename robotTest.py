@@ -6,25 +6,25 @@ import signal, sys
 from rplidar import RPLidar,RPLidarException
 from time import sleep
 from os import popen
-from astar import astar, convertToMatrix, dataLidar, solutionRobot
+from astar import astar, convertToMatrix, dataLidar, solutionRobot, instructionRobot
 
 LIDAR_PORT = '/dev/ttyUSB0'
 
-#### comenter
-#/dev/ttyACM0
-robotPort = os.popen('ls /dev/ttyACM*').read().strip()
-print("Found serial : " + robotPort)
+# #### comenter
+# #/dev/ttyACM0
+# robotPort = os.popen('ls /dev/ttyACM*').read().strip()
+# print("Found serial : " + robotPort)
 
-def openSerial():
-    return serial.Serial(robotPort)
+# def openSerial():
+#     return serial.Serial(robotPort)
 
-# def sendInstruction(char, ser):
-#     ser.write(char.encode())
+# # def sendInstruction(char, ser):
+# #     ser.write(char.encode())
 
-ser = openSerial()
+# ser = openSerial()
 
-# instructionRobot(path, ser)
-#### /comenter
+# # instructionRobot(path, ser)
+# #### /comenter
 
 lidar_change = 0
 current = 0
@@ -49,7 +49,11 @@ while(True):
         end = (9, 5)
         pathAstar = astar(matrix0, start, end)
         print("NEW Astar path: {}".format(pathAstar))
-        solutionRobot(pathAstar, ser)
+        solutionRobot(pathAstar, ser=None)
+        # instructionRobot(pathAstar, ser)
+        # displayMatrix(matrix0)
+        # displayPath(matrix0, path)
+        # print(verify(matrix0, start, end, path))
         # for (i, val) in enumerate(lidar.iter_measurments()):
         #     _, qual, angle, dist = val
         #     print(qual, angle, dist)
@@ -78,5 +82,5 @@ while(True):
 #     # To do dans cette partie
 
 
-ser.close()
+# ser.close()
 
