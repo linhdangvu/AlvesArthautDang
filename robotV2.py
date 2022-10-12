@@ -6,7 +6,7 @@ import signal, sys
 from rplidar import RPLidar,RPLidarException
 from time import sleep
 from os import popen
-from astar import runLidarWithRobot
+from astar import runLidarWithRobotV2
 
 LIDAR_PORT = '/dev/ttyUSB0'
 
@@ -38,9 +38,9 @@ while(True):
                 # print("{};{}".format(angle, dist))
                 point.append((angle, dist))
             break
-        
-        runLidarWithRobot(point, ser)
-        
+
+        runLidarWithRobotV2(point, ser)
+
         # for (i, val) in enumerate(lidar.iter_measurments()):
         #     _, qual, angle, dist = val
         #     print(qual, angle, dist)
