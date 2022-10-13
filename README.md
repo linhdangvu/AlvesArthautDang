@@ -30,9 +30,9 @@ python3 AlvesArthautDang/robot.py
 
 1. Write function Astar
 2. Try to get data from CSV (angle, dist) => convert to catesian (x, y)
-   => matrice => put Astar into the matrice[10][10]
+   => matrice[10][10] => put Astar into the matrice
 3. Scan Lidar data (angle, dist) => (x, y)
-   => matrice => put Astar in matrice[10][10]
+   => matrice[10][10] => put Astar in matrice
    - Point start = (0, 5)
    - Point end (9, 5)
    - Matrice dimension 10x10
