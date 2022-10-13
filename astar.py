@@ -182,25 +182,29 @@ def increaseObstacle(mat):
                         mat[i][j+1] = 2.
     return mat
 
-def roundZero(mat):
-    nMat = np.pad(mat, pad_width=1, mode='constant', constant_values=0)
-    return nMat
+def hasObstacleBefore(mat, start):
+    startX = start[0]
+    startY = start[1]
+    return mat[startX][startY] == 1 or mat[startX][startY]==2 or mat[startX][startY+1]==1 or mat[startX][startY+1]==2 or mat[startX][startY-1]==1 or mat[startX][startY-1]==2
+
+def addZero(mat):
+    row_mat = len(mat[len(mat)-1])
+    zero_list = np.asarray([[0.]*row_mat])
+    new_mat = np.concatenate((zero_list, mat), axis=0)
+    return new_mat
 
 def convertToMatrix(path):
     matrix = np.asarray([[0.]*10]*10) 
+    start = (0,5)
     for i in path:
-        x = int(i[0]/200) # 20 cases => 0 -> 19
-        y = int(i[1]/200) # 20 cases => 0 -> 10
+        x = int(i[0]/200) # 10 cases => 0 -> 9
+        y = int(i[1]/200) # 10 cases => 0 -> 9
         matrix[x][y] = 1.
-    if matrix[0][4] == 1 or matrix[0][5] == 1:
-        matrix = roundZero(matrix)
-        matrix = increaseObstacle(matrix)
+    if hasObstacleBefore(matrix, start):
+        matrix = addZero(matrix)
+    matrix = increaseObstacle(matrix)
     # print(matrix)
     return matrix
-
-def rotateLeftMatrix(m):
-    return np.asarray([[m[j][i] for j in range(len(m))] for i in range(len(m[0])-1,-1,-1)])
-
 
 ##### ROBOT #####
 def sendInstruction(char, ser):
@@ -231,27 +235,6 @@ def goRight(ser):
         sleep(0.1)
         sendInstruction('d', ser)
 
-def turnDown(ser):
-    sleep(0.5)
-    for i in range(70):
-        sleep(0.1)
-        sendInstruction('e', ser) # turn right 180°
-    # goUp(ser)
-
-def turnRight(ser):
-    sleep(0.5)
-    for i in range(20):
-        sleep(0.1)
-        sendInstruction('e', ser) # turn right 90°
-    # goUp(ser)
-
-def turnLeft(ser):
-    sleep(0.5)
-    for i in range(20):
-        sleep(0.1)
-        sendInstruction('a', ser) # turn right 90°
-    # goUp(ser)
-
 def pathRobot(pathAstar):
     path = []
     for (index, item) in enumerate(pathAstar):
@@ -261,9 +244,6 @@ def pathRobot(pathAstar):
         pos = (item[0] - pathAstar[index-1][0] ,item[1] - pathAstar[index-1][1])
         path.append(pos)
     return path
-
-def sameDirection(pos, direction):
-    return pos == direction
 
 def solutionRobot(pathAstar, ser):
     path_robot = pathRobot(pathAstar)
@@ -284,69 +264,17 @@ def solutionRobot(pathAstar, ser):
             goRight(ser)
             print("Go right")
 
-# def instructionRobot(pathAstar, ser):
-#     path_robot = pathRobot(pathAstar)
-#     direction = pathAstar[0]
-#     for (index, pos) in enumerate(path_robot[0:1]):
-#         # print(1/(index+1))
-#         # sleep(1/(index+1))
-#         if sameDirection(pos, direction):
-#             print ('continue same direction')
-#         else:
-#             if pos == DOWN:
-#                 # TO go down
-#                 if direction == LEFT:
-#                     print("Turn left <=")
-#                     turnLeft(ser)
-#                 elif direction == RIGHT:
-#                     print("Turn right =>")
-#                     turnRight(ser)
-#                 else:
-#                     print("Turn down")
-#                     turnDown(ser)
-#                 print("Go ahead - D")
-#                 goUp(ser)
-#                 direction = DOWN  
-#                 # print("Go down")      
-#             if pos == UP:
-#                 # To go up
-#                 if direction == LEFT:
-#                     print ("Turn right =>")
-#                     turnRight(ser)
-#                 if direction == RIGHT:
-#                     print ("Turn left <=")
-#                     turnLeft(ser)
-#                 print("Go up or ahead")
-#                 goUp(ser)
-#                 direction = UP
-#                 # print("Go up")
-#             if pos == LEFT:
-#                 # To go left
-#                 if direction == DOWN:
-#                     print("Turn right =>")
-#                     turnRight(ser)
-#                 # if direction == UP:
-#                 #     print("Turn left <=")
-#                 else:
-#                     print("Turn left and go")
-#                     turnLeft(ser)
-#                     goUp(ser)
-#                 direction = LEFT
-#                 # print("Go left")
-#             if pos == RIGHT:
-#                 # To go right
-#                 # if direction == UP:
-#                 #     print("Turn right =>")
-#                 if direction == DOWN:
-#                     print("Turn left <=")
-#                     turnLeft(ser)
-#                 else:
-#                     print("Turn right and go")
-#                     turnRight(ser)
-#                 goUp(ser)
-#                 # print("Go ahead - R")
-#                 direction = RIGHT
-#                 # print("Go right")
+##### LIDAR + ROBOT
+def runLidarWithRobot(point, ser):
+    # transform Lidar to matrix and create A star
+    pathLidar = dataLidar(point)
+    matrix0 = convertToMatrix(pathLidar)
+    start = (0, 5)
+    end = (9, 5)
+    print(matrix0)
+    pathAstar = astar(matrix0, start, end)
+    print("NEW Astar path: {}".format(pathAstar))
+    solutionRobot(pathAstar, ser)
 
 ##################
 

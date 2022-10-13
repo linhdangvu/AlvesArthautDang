@@ -6,7 +6,7 @@ import signal, sys
 from rplidar import RPLidar,RPLidarException
 from time import sleep
 from os import popen
-from astar import astar, convertToMatrix, dataLidar, solutionRobot
+from astar import runLidarWithRobot
 
 LIDAR_PORT = '/dev/ttyUSB0'
 
@@ -23,17 +23,13 @@ def openSerial():
 
 ser = openSerial()
 
-# instructionRobot(path, ser)
 #### /comenter
 
-lidar_change = 0
-current = 0
 while(True):
     print('starting...')
     sleep(1)
     try :
         lidar = RPLidar(LIDAR_PORT)
-
         point = []
         for i, scan in enumerate(lidar.iter_scans()):
             for qual, angle, dist in scan:
@@ -41,15 +37,7 @@ while(True):
                 point.append((angle, dist))
             break
         
-        # transform Lidar to matrix and create A star
-        pathLidar = dataLidar(point)
-        matrix0 = convertToMatrix(pathLidar)
-        print(matrix0)
-        start = (0, 5)
-        end = (9, 5)
-        pathAstar = astar(matrix0, start, end)
-        print("NEW Astar path: {}".format(pathAstar))
-        solutionRobot(pathAstar, ser)
+        runLidarWithRobot(point, ser)
         # for (i, val) in enumerate(lidar.iter_measurments()):
         #     _, qual, angle, dist = val
         #     print(qual, angle, dist)
