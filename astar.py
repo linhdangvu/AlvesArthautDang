@@ -169,17 +169,16 @@ def dataLidar(path): # angle dist => lidar
 #     plt.show()
 
 def increaseObstacle(mat):
-    for i in range(len(mat)):
-        for j in range(len(mat[i])):
-            #print("{},{}".format(i,j))
-            if mat[i][j] == 1:
-                #print("{},{}".format(i,j))
-                # print("{},{}".format(i,j))
-                if mat[i][j-1] != 1:
-                    mat[i][j-1] = 2.
-                if j < (len(mat[i])-1):
-                    if mat[i][j+1] != 1:
-                        mat[i][j+1] = 2.
+    for (x, item) in enumerate(mat):
+        for (y, item2) in enumerate(item):
+            #print("{},{}".format(x,y))
+            if item2 == 1:
+                if y < (len(item)-1):
+                    if mat[x][y+1] != 1:
+                        mat[x][y+1] = 2
+                if y > 1:
+                    if mat[x][y-1] != 1:
+                        mat[x][y-1] = 2       
     return mat
 
 def hasObstacleBefore(mat, start):
