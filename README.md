@@ -43,3 +43,4 @@ python3 AlvesArthautDang/robot.py
    - (0, -1) => RIGHT => "d"
    - (1, 0) => UP => "z"
    - (-1, 0) => DOWN => "s"
+6. Create a boucle infinity for step 3 => 5
