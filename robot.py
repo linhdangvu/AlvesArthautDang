@@ -23,7 +23,6 @@ def openSerial():
 
 ser = openSerial()
 
-# instructionRobot(path, ser)
 #### /comenter
 
 while(True):
@@ -31,7 +30,6 @@ while(True):
     sleep(1)
     try :
         lidar = RPLidar(LIDAR_PORT)
-
         point = []
         for i, scan in enumerate(lidar.iter_scans()):
             for qual, angle, dist in scan:
@@ -40,7 +38,6 @@ while(True):
             break
         
         runLidarWithRobot(point, ser)
-        
         # for (i, val) in enumerate(lidar.iter_measurments()):
         #     _, qual, angle, dist = val
         #     print(qual, angle, dist)

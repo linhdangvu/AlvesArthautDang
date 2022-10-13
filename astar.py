@@ -168,40 +168,38 @@ def dataLidar(path): # angle dist => lidar
 #     plt.show()
 
 def increaseObstacle(mat):
-    for i in range(len(mat)):
-        for j in range(len(mat[i])):
-            #print("{},{}".format(i,j))
-            if mat[i][j] == 1:
-                if mat[i][j-1] != 1:
-                    mat[i][j-1] = 2.
-                if j < (len(mat[i])-1):
-                    if mat[i][j+1] != 1:
-                        mat[i][j+1] = 2.
+    for (x, item) in enumerate(mat):
+        for (y, item2) in enumerate(item):
+            #print("{},{}".format(x,y))
+            if item2 == 1:
+                if y < (len(item)-1):
+                    if mat[x][y+1] != 1:
+                        mat[x][y+1] = 2
+                if y > 1:
+                    if mat[x][y-1] != 1:
+                        mat[x][y-1] = 2       
     return mat
 
-# surround matrix with 0
-def roundZero(mat):
-    nMat = np.pad(mat, pad_width=1, mode='constant', constant_values=0)
-    return nMat
+def hasObstacleBefore(mat, start):
+    startX = start[0]
+    startY = start[1]
+    return mat[startX][startY] == 1 or mat[startX][startY]==2 or mat[startX][startY+1]==1 or mat[startX][startY+1]==2 or mat[startX][startY-1]==1 or mat[startX][startY-1]==2
+
+def addZero(mat):
+    row_mat = len(mat[len(mat)-1])
+    zero_list = np.asarray([[0.]*row_mat])
+    new_mat = np.concatenate((zero_list, mat), axis=0)
+    return new_mat
 
 def convertToMatrix(path):
     matrix = np.asarray([[0.]*10]*10) 
-    for i in path:
-        x = int(i[0]/200) # 20 cases => 0 -> 19
-        y = int(i[1]/200) # 20 cases => 0 -> 10
-        matrix[x][y] = 1.
-    if matrix[0][4] == 1 or matrix[0][5] == 1:
-        matrix = roundZero(matrix)
-    matrix = increaseObstacle(matrix)
-    # print(matrix)
-    return matrix
-
-def convertToMatrixV2(path):
-    matrix = np.asarray([[0.]*10]*10) 
+    start = (0,5)
     for i in path:
         x = int(i[0]/200) # 10 cases => 0 -> 9
         y = int(i[1]/200) # 10 cases => 0 -> 9
         matrix[x][y] = 1.
+    if hasObstacleBefore(matrix, start):
+        matrix = addZero(matrix)
     matrix = increaseObstacle(matrix)
     # print(matrix)
     return matrix
@@ -245,9 +243,6 @@ def pathRobot(pathAstar):
         path.append(pos)
     return path
 
-# def sameDirection(pos, direction):
-#     return pos == direction
-
 def solutionRobot(pathAstar, ser):
     path_robot = pathRobot(pathAstar)
     # print("Path robot: {}".format(path_robot))
@@ -267,33 +262,14 @@ def solutionRobot(pathAstar, ser):
             goRight(ser)
             print("Go right")
 
-##### ROBOT CONNECT WITH LIDAR
+##### LIDAR + ROBOT
 def runLidarWithRobot(point, ser):
-    # transform Lidar point to matrix and create A star
-    pathLidar = dataLidar(point)
-    matrix0 = convertToMatrix(pathLidar)
-    print(matrix0)
-    start = (0, 5)
-    end = (9, 5)
-    pathAstar = astar(matrix0, start, end)
-    print("NEW Astar path: {}".format(pathAstar))
-    solutionRobot(pathAstar, ser)
-
-def runLidarWithRobotV2(point, ser):
-    # transform Lidar point to matrix and create A star
+    # transform Lidar to matrix and create A star
     pathLidar = dataLidar(point)
     matrix0 = convertToMatrix(pathLidar)
     start = (0, 5)
     end = (9, 5)
     print(matrix0)
-    startX = start[0]
-    startY = start[1]
-    if matrix0[startX][startY] == 1:
-        # go down a bit
-        sleep(0.1)
-        for i in range(2):
-            sleep(0.1)
-            sendInstruction('s', ser)
     pathAstar = astar(matrix0, start, end)
     print("NEW Astar path: {}".format(pathAstar))
     solutionRobot(pathAstar, ser)
