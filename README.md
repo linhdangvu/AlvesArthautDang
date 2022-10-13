@@ -37,7 +37,7 @@ python3 AlvesArthautDang/robot.py
    - Point end (9, 5)
    - Matrice dimension 10x10
 4. Take 2 first element from Astar => convert to position
-   Exemple: path_astar = [(0, 5), (0, 6)] => path_robot = [(0 - 0, (6 - 5))] = [(0, 1)] => LEFT
+   - Exemple: path_astar = [(0, 5), (0, 6)] => path_robot = [(0 - 0, (6 - 5))] = [(0, 1)] => LEFT
 5. Send to robot the position to go
    - (0, 1) => LEFT => "q"
    - (0, -1) => RIGHT => "d"
