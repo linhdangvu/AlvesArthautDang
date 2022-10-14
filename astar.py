@@ -115,7 +115,7 @@ def astar(maze, start, end):
                 return reconstituesChemin(current)
             children = []
             # check if there are no neighbor
-            for pos in [UP, RIGHT, DOWN, LEFT]: # (-1,0) => UP, (0,1) => RIGHT, (0,-1) => LEFT, (1,0) => DOWN
+            for pos in [UP, RIGHT, DOWN, LEFT]: 
                 next_pos = (current.getX() + pos[0],current.getY() + pos[1])
                 if not validNeighbor(next_pos, maze):
                     continue # stop the for loop
@@ -189,7 +189,7 @@ def addZero(mat):
     row_mat = len(mat[len(mat)-1])
     zero_list = np.asarray([[0.]*row_mat])
     new_mat = np.concatenate((zero_list, mat), axis=0)
-    return new_mat
+    return new_mat[0:len(mat)]
 
 def increaseThirdObstacle(mat, start):
     # if there are obstacle in ligne 3 => x
@@ -207,13 +207,13 @@ def increaseThirdObstacle(mat, start):
 
 def convertToMatrix(path):
     matrix = np.asarray([[0.]*10]*10) 
-    start = (0,5)
+    start = (0,4)
     for i in path:
         x = int(i[0]/200) # 10 cases => 0 -> 9
         y = int(i[1]/200) # 10 cases => 0 -> 9
         matrix[x][y] = 1.
     # if 3 ligne have obstacle => increase 3 & 2 ligne
-    third_ligne = (2,5)
+    third_ligne = (2,4)
     if hasObstacleBefore(matrix, third_ligne):
         matrix = increaseThirdObstacle(matrix, third_ligne)
     # if 1 ligne have obstacle => increase 1 ligne
@@ -245,12 +245,18 @@ def goLeft(ser):
     for i in range(15):
         sleep(0.1)
         sendInstruction('q', ser)
+    for i in range(3):
+        sleep(0.1)
+        sendInstruction('a', ser)
 
 def goRight(ser):
     sleep(0.1)
     for i in range(15):
         sleep(0.1)
         sendInstruction('d', ser)
+    for i in range(3):
+        sleep(0.1)
+        sendInstruction('e', ser)
 
 def pathRobot(pathAstar):
     path = []
@@ -276,18 +282,20 @@ def solutionRobot(pathAstar, ser):
             print("Go up")
         if pos == LEFT:
             goLeft(ser)
+
             print("Go left")
         if pos == RIGHT:
             goRight(ser)
             print("Go right")
 
 ##### LIDAR + ROBOT
+# Point start 
 def runLidarWithRobot(point, ser):
     # transform Lidar to matrix and create A star
     pathLidar = dataLidar(point)
     matrix0 = convertToMatrix(pathLidar)
-    start = (0, 5)
-    end = (9, 5)
+    start = (0, 4)
+    end = (9, 4)
     print(matrix0)
     pathAstar = astar(matrix0, start, end)
     print("NEW Astar path: {}".format(pathAstar))
