@@ -191,6 +191,20 @@ def addZero(mat):
     new_mat = np.concatenate((zero_list, mat), axis=0)
     return new_mat
 
+def increaseThirdObstacle(mat, start):
+    # if there are obstacle in ligne 3 => x
+    x = start[0]
+    y = start[1]
+    # add 1 on ligne 2 => x - 1
+    mat[x-1][y] = 1.
+    mat[x-1][y+1] = 1.
+    mat[x-1][y-1] = 1.
+    # add 1 on ligne 3 => x
+    mat[x][y] = 1.
+    mat[x][y+1] = 1.
+    mat[x][y-1] = 1.
+    return mat
+
 def convertToMatrix(path):
     matrix = np.asarray([[0.]*10]*10) 
     start = (0,5)
@@ -198,6 +212,11 @@ def convertToMatrix(path):
         x = int(i[0]/200) # 10 cases => 0 -> 9
         y = int(i[1]/200) # 10 cases => 0 -> 9
         matrix[x][y] = 1.
+    # if 3 ligne have obstacle => increase 3 & 2 ligne
+    third_ligne = (2,5)
+    if hasObstacleBefore(matrix, third_ligne):
+        matrix = increaseThirdObstacle(matrix, third_ligne)
+    # if 1 ligne have obstacle => increase 1 ligne
     if hasObstacleBefore(matrix, start):
         matrix = addZero(matrix)
     matrix = increaseObstacle(matrix)
